@@ -53,3 +53,5 @@ vcpkg_installed/
 Thumbs.db
 Desktop.ini
 *~
+
+build_project.sh
