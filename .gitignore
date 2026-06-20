@@ -1,0 +1,55 @@
+# Build output (out-of-source builds)
+build/
+out/
+cmake-build-*/
+
+# CMake artifacts (guard against accidental in-source configure)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+install_manifest.txt
+compile_commands.json
+CMakeUserPresets.json
+
+# Object files and libraries
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+
+# Executables and debug info
+*.exe
+*.out
+*.app
+*.pdb
+*.ilk
+*.exp
+
+# Generated SPIR-V (shaders compile into the build tree)
+*.spv
+
+# Dependency manager (vcpkg; FetchContent lands inside build/)
+vcpkg_installed/
+
+# Visual Studio
+.vs/
+*.user
+*.vcxproj.user
+*.suo
+
+# VS Code
+.vscode/
+
+# JetBrains / CLion
+.idea/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+Desktop.ini
+*~
