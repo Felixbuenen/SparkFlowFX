@@ -9,6 +9,8 @@ set(APP_SOURCES
     UI/mainwindow.cpp
     UI/mainwindow.h
     UI/mainwindow.ui
+    UI/viewportwidget.cpp
+    UI/viewportwidget.h
 )
 
 add_executable(App ${APP_SOURCES})
