@@ -5,6 +5,7 @@ set(CORE_SOURCES
     simulation.cpp
     simulation.h
     vec3.h
+    rand.h
 )
 
 add_library(Core STATIC ${CORE_SOURCES})
