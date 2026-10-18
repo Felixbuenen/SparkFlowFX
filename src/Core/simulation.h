@@ -26,6 +26,10 @@ namespace sparkflow::simulation {
 		float maxSpeed{ 5.0f };
 		float lifespanSec{ 4.0f };
 		std::uint32_t seed{ 1 };
+
+		// TEMP forces
+		vec3 gravity{ 0.0f, -9.81f, 0.0f };
+		float drag{ 0.5f };
 	};
 
 	struct SimulationData
@@ -67,7 +71,7 @@ namespace sparkflow::simulation {
 
 		// operators
 		void emitNew(float dt);
-		void solveForces(float dt);
+		void solveForces();
 		void updateVelocities(float dt);
 		void updatePositions(float dt);
 		void updateAges(float dt);

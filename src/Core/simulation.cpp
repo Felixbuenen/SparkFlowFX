@@ -32,7 +32,7 @@ namespace sparkflow::simulation {
         
         // 13-10-26 next step: add integration/position updates. Then we can start drawing GL_POINTS.
 
-        solveForces(dt);
+        solveForces();
         updateVelocities(dt);
         updatePositions(dt);
         updateAges(dt);
@@ -89,19 +89,46 @@ namespace sparkflow::simulation {
         m_emitBudget -= std::floor(m_emitBudget);
     }
 
-    void Simulator::solveForces(float dt)
+    void Simulator::solveForces()
     {
-        // TODO: for now, apply a simple dampening and gravity force
+        auto& data = m_simData;
+
+        for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
+        {
+            if (!data.active[idx])
+                continue;
+
+            // TODO: currently hard-coded forces - gravity and drag. Should depend on user-defined force-network.
+            // Drag is currently calculated simply as F_drag = -k * V.
+            data.forces[idx] = m_config.gravity - m_config.drag * data.velocities[idx];
+        }
     }
 
     void Simulator::updateVelocities(float dt)
     {
-        // TODO: based on the forces, calculate the new velocities
+        auto& data = m_simData;
+
+        for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
+        {
+            if (!data.active[idx])
+                continue;
+
+            // solving F=ma (assuming a = 1), where a = (V-V0)/t
+            data.velocities[idx] += data.forces[idx] * dt;
+        }
     }
 
     void Simulator::updatePositions(float dt)
     {
-        // TODO: based on the velocities, update the positions
+        auto& data = m_simData;
+
+        for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
+        {
+            if (!data.active[idx])
+                continue;
+
+            data.positions[idx] += data.velocities[idx] * dt;
+        }
     }
 
     void Simulator::updateAges(float dt)
