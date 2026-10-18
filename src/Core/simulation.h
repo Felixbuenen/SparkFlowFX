@@ -21,10 +21,10 @@ namespace sparkflow::simulation {
 		std::size_t capacity{ 1'000 };
 
 		// TEMP particle simulation config
-		float emitRateSec{ 5.0f };
+		float emitRateSec{ 10.0f };
 		float minSpeed{ 1.0f };
 		float maxSpeed{ 5.0f };
-		float lifespanSec{ 2.0f };
+		float lifespanSec{ 4.0f };
 		std::uint32_t seed{ 1 };
 	};
 
@@ -45,10 +45,11 @@ namespace sparkflow::simulation {
 		std::vector<vec3> positions;
 		std::vector<vec3> velocities;
 		std::vector<vec3> forces;
-		std::vector<float> masses;
 		std::vector<float> ages;
 		std::vector<float> lifespans;
+
 		std::size_t aliveCount{ 0 };
+		std::size_t activeEnd{ 0 };
 	};
 
 	class Simulator
@@ -56,7 +57,6 @@ namespace sparkflow::simulation {
 	public:
 		explicit Simulator(SimulationConfig config = {}, SimulationData data = {});
 
-		void init();
 		void advanceFrame();
 
 		std::size_t frame() const noexcept { return m_frame; }
@@ -71,7 +71,10 @@ namespace sparkflow::simulation {
 		void updateVelocities(float dt);
 		void updatePositions(float dt);
 		void updateAges(float dt);
-		void kill(float dt);
+		void kill();
+
+		// utility
+		void killParticle(size_t idx);
 
 	private:
 		SimulationConfig m_config;

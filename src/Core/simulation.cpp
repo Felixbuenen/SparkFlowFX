@@ -15,11 +15,6 @@ namespace sparkflow::simulation {
     {
     }
 
-    void Simulator::init()
-    {
-
-    }
-
     void Simulator::advanceFrame()
     {
         const float dt = 1.0f / static_cast<float>(m_config.framesPerSecond * m_config.substeps);
@@ -35,11 +30,14 @@ namespace sparkflow::simulation {
     {
         std::cout << "Do step: " << m_frame << "\n";
         
-        updateAges(dt);
-        kill(dt);
-        emitNew(dt);
+        // 13-10-26 next step: add integration/position updates. Then we can start drawing GL_POINTS.
+
         solveForces(dt);
+        updateVelocities(dt);
         updatePositions(dt);
+        updateAges(dt);
+        kill();
+        emitNew(dt);
     }
 
     // OPERATORS
@@ -59,6 +57,7 @@ namespace sparkflow::simulation {
                 break;
             }
 
+            //std::cout << "emit: look for empty spot " << idx << std::endl;
             // look for empty spot
             if (data.active[idx])
                 continue;
@@ -69,6 +68,8 @@ namespace sparkflow::simulation {
 
             const vec3 initialVel = speed * dir;
 
+            //std::cout << "emit: create new data " << idx << std::endl;
+
             data.active[idx] = true;
             data.positions[idx] = { 0.0f, 0.0f, 0.0f };
             data.velocities[idx] = { dir.x * speed, dir.y * speed, dir.z * speed };
@@ -77,6 +78,7 @@ namespace sparkflow::simulation {
 
             ++data.aliveCount;
             m_emitBudget -= 1.0f;
+            data.activeEnd = std::max(data.activeEnd, idx + 1);
 
             std::cout << "Particle " << idx << " emitted!" << std::endl;
         }
@@ -104,12 +106,43 @@ namespace sparkflow::simulation {
 
     void Simulator::updateAges(float dt)
     {
-        // TODO: use the simulation step to calculate the new age
+        auto& data = m_simData;
+
+        for (size_t idx = 0; idx < data.activeEnd; ++idx)
+        {
+            //std::cout << "updateAges: check active " << idx << std::endl;
+            // only active agents
+            if (!data.active[idx])
+                continue;
+
+            //std::cout << "updateAges: update age " << idx << std::endl;
+            data.ages[idx] += dt;
+        }
     }
 
-    void Simulator::kill(float dt)
+    void Simulator::kill()
     {
-        // TODO: kill any particles that are past 
+        auto& data = m_simData;
+        for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
+        {
+            if (data.active[idx] && data.ages[idx] >= data.lifespans[idx])
+                killParticle(idx);
+        }
+
+        // update active end
+        while (data.activeEnd > 0 && !data.active[data.activeEnd - 1])
+            --data.activeEnd;
     }
+
+    void Simulator::killParticle(size_t idx)
+    {
+        //std::cout << "killParticle: trying to kill " << idx << std::endl;
+        auto& data = m_simData;
+        data.aliveCount--;
+        data.active[idx] = false;
+
+        std::cout << "Particle " << idx << " killed!" << std::endl;
+    }
+
 
 }
