@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <QOpenGLContext>
+#include <QtLogging>
 
 #include "renderer.h"
 #include "simulation.h"
@@ -18,9 +19,12 @@ ViewportWidget::~ViewportWidget() = default;
 void ViewportWidget::initializeGL()
 {
     // Core's GLAD resolves its GL function pointers through Qt's context
-    const bool ok = sparkflow::render::InitializeGL([](const char* name) {
+    const bool ok = sparkflow::render::LoadGL([](const char* name) {
         return QOpenGLContext::currentContext()->getProcAddress(name);
         });
+
+    if (!ok)
+        qFatal("Failed to load OpenGL functions");
 
     m_lastTick = std::chrono::steady_clock::now();
 }

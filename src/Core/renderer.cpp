@@ -3,7 +3,7 @@
 
 namespace sparkflow::render {
 
-    bool InitializeGL(GLProcLoader loader)
+    bool LoadGL(GLProcLoader loader)
     {
         return gladLoadGL(loader) != 0;
     }

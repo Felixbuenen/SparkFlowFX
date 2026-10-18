@@ -4,6 +4,6 @@ namespace sparkflow::render {
 	using GLProc = void (*)();
 	using GLProcLoader = GLProc(*)(const char*);
 
-	bool InitializeGL(GLProcLoader loader);
+	bool LoadGL(GLProcLoader loader);
 	void Render();
 }
