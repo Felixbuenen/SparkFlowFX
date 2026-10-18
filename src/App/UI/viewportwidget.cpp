@@ -18,6 +18,17 @@ ViewportWidget::~ViewportWidget() = default;
 
 void ViewportWidget::initializeGL()
 {
+    // check if the actual context is equal to the requested context
+    const QSurfaceFormat requested = QSurfaceFormat::defaultFormat();
+    const QSurfaceFormat actual = context()->format();
+
+    if (actual.profile() != requested.profile() || actual.version() < requested.version())
+    {
+        qFatal("Requested OpenGL %d.%d core, but the driver provided %d.%d",
+            requested.majorVersion(), requested.minorVersion(),
+            actual.majorVersion(), actual.minorVersion());
+    }
+
     // Core's GLAD resolves its GL function pointers through Qt's context
     const bool ok = sparkflow::render::LoadGL([](const char* name) {
         return QOpenGLContext::currentContext()->getProcAddress(name);
