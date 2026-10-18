@@ -5,12 +5,10 @@
 #include <random>
 #include <vector>
 
-#include <vec3.h>
 #include "rand.h"
+#include "glm/vec3.hpp"
 
 namespace sparkflow::simulation {
-
-	using sparkflow::core::vec3;
 
 	struct SimulationConfig
 	{
@@ -28,7 +26,7 @@ namespace sparkflow::simulation {
 		std::uint32_t seed{ 1 };
 
 		// TEMP forces
-		vec3 gravity{ 0.0f, -9.81f, 0.0f };
+		glm::vec3 gravity{ 0.0f, -9.81f, 0.0f };
 		float drag{ 0.5f };
 	};
 
@@ -46,9 +44,9 @@ namespace sparkflow::simulation {
 
 		// TODO: should probably become array?
 		std::vector<std::uint8_t> active;
-		std::vector<vec3> positions;
-		std::vector<vec3> velocities;
-		std::vector<vec3> forces;
+		std::vector<glm::vec3> positions;
+		std::vector<glm::vec3> velocities;
+		std::vector<glm::vec3> forces;
 		std::vector<float> ages;
 		std::vector<float> lifespans;
 

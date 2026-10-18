@@ -6,7 +6,7 @@
 #include <numbers>
 #include <random>
 
-#include <vec3.h>
+#include "glm/vec3.hpp"
 
 // One of the features of SparkFlowFX is determinism: the same seed must produce the same particles
 // on every compiler and OS. That requires two things:
@@ -31,7 +31,7 @@ namespace sparkflow::random {
         return static_cast<float>(static_cast<std::uint32_t>(rng()) >> 8) * 0x1p-24f;
     }
 
-    core::vec3 randomUnitVector(Uniform32BitGenerator auto& rng)
+    glm::vec3 randomUnitVector(Uniform32BitGenerator auto& rng)
     {
         const float z = 2.0f * uniform01(rng) - 1.0f;
         const float phi = 2.0f * std::numbers::pi_v<float> *uniform01(rng);

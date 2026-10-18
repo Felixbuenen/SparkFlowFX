@@ -1,8 +1,9 @@
 #include "viewportwidget.h"
 
 #include <algorithm>
-#include <QOpenGLContext>
 #include <QtLogging>
+#include <QOpenGLContext>
+#include <QSurfaceFormat>
 
 #include "renderer.h"
 #include "simulation.h"
@@ -18,7 +19,7 @@ ViewportWidget::~ViewportWidget() = default;
 
 void ViewportWidget::initializeGL()
 {
-    // check if the actual context is equal to the requested context
+    // Fail fast if the driver didn't provide the requested profile and at least the requested version
     const QSurfaceFormat requested = QSurfaceFormat::defaultFormat();
     const QSurfaceFormat actual = context()->format();
 

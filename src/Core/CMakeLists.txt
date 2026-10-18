@@ -4,7 +4,6 @@ set(CORE_SOURCES
     renderer.h
     simulation.cpp
     simulation.h
-    vec3.h
     rand.h
 )
 
@@ -12,6 +11,9 @@ add_library(Core STATIC ${CORE_SOURCES})
 
 add_subdirectory(vendor/glad)
 target_link_libraries(Core PRIVATE glad)
+
+add_subdirectory(vendor/glm)
+target_link_libraries(Core PUBLIC glm::glm)
 
 target_include_directories(Core
     PUBLIC

@@ -62,9 +62,8 @@ namespace sparkflow::simulation {
 
             // random speed and initial direction
             const float speed = std::lerp(m_config.minSpeed, m_config.maxSpeed, random::uniform01(m_rng));
-            const vec3 dir = random::randomUnitVector(m_rng);
-
-            const vec3 initialVel = speed * dir;
+            const glm::vec3 dir = random::randomUnitVector(m_rng);
+            const glm::vec3 initialVel = speed * dir;
 
             //std::cout << "emit: create new data " << idx << std::endl;
 
