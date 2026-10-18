@@ -8,10 +8,10 @@
 
 namespace sparkflow::simulation {
 
-    Simulator::Simulator(SimulationConfig config, SimulationData data)
+    Simulator::Simulator(SimulationConfig config)
         : m_config{ config }
-        , m_simData{ std::move(data) }
-        , m_rng{ config.seed }
+        , m_rng{ m_config.seed }
+        , m_simData{ m_config.capacity }
     {
     }
 
@@ -30,8 +30,6 @@ namespace sparkflow::simulation {
     {
         std::cout << "Do step: " << m_frame << "\n";
         
-        // 13-10-26 next step: add integration/position updates. Then we can start drawing GL_POINTS.
-
         solveForces();
         updateVelocities(dt);
         updatePositions(dt);

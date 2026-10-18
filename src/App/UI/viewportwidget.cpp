@@ -8,7 +8,7 @@
 
 ViewportWidget::ViewportWidget(QWidget* parent, Qt::WindowFlags f)
     : QOpenGLWidget(parent, f)
-    , m_Sim{ std::make_unique<sparkflow::simulation::Simulator>()}
+    , m_sim{ std::make_unique<sparkflow::simulation::Simulator>()}
 {
     connect(this, &QOpenGLWidget::frameSwapped, this, [this] { update(); });
 }
@@ -22,7 +22,7 @@ void ViewportWidget::initializeGL()
         return QOpenGLContext::currentContext()->getProcAddress(name);
         });
 
-    m_LastTick = std::chrono::steady_clock::now();
+    m_lastTick = std::chrono::steady_clock::now();
 }
 
 void ViewportWidget::paintGL()
@@ -39,15 +39,15 @@ void ViewportWidget::advanceSimulation()
 
     constexpr int maxFramesPerUpdate = 5;
     const auto frameInterval = duration_cast<nanoseconds>(
-        duration<double>{ 1.0 / m_Sim->config().framesPerSecond });
+        duration<double>{ 1.0 / m_sim->config().framesPerSecond });
 
     const auto now = steady_clock::now();
-    m_Accumulator = std::min<nanoseconds>(m_Accumulator + (now - m_LastTick), frameInterval * maxFramesPerUpdate);
-    m_LastTick = now;
+    m_accumulator = std::min<nanoseconds>(m_accumulator + (now - m_lastTick), frameInterval * maxFramesPerUpdate);
+    m_lastTick = now;
 
-    while (m_Accumulator >= frameInterval)
+    while (m_accumulator >= frameInterval)
     {
-        m_Sim->advanceFrame();
-        m_Accumulator -= frameInterval;
+        m_sim->advanceFrame();
+        m_accumulator -= frameInterval;
     }
 }

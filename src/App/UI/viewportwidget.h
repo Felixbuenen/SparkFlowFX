@@ -22,7 +22,7 @@ protected:
 private:
     void advanceSimulation();
 
-    std::unique_ptr<sparkflow::simulation::Simulator> m_Sim;
-    std::chrono::steady_clock::time_point m_LastTick;
-    std::chrono::nanoseconds m_Accumulator{};
+    std::unique_ptr<sparkflow::simulation::Simulator> m_sim;
+    std::chrono::steady_clock::time_point m_lastTick;
+    std::chrono::nanoseconds m_accumulator{};
 };

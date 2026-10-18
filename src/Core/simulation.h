@@ -18,7 +18,7 @@ namespace sparkflow::simulation {
 		std::uint32_t framesPerSecond{ 24 };
 		std::uint32_t substeps{ 1 };
 
-		std::size_t capacity{ 1'000 };
+		std::size_t capacity{ 2'000 };
 
 		// TEMP particle simulation config
 		float emitRateSec{ 10.0f };
@@ -34,7 +34,7 @@ namespace sparkflow::simulation {
 
 	struct SimulationData
 	{
-		SimulationData(std::size_t capacity = 1'000)
+		explicit SimulationData(std::size_t capacity)
 			: active(capacity, false)
 			, positions(capacity)
 			, velocities(capacity)
@@ -59,7 +59,7 @@ namespace sparkflow::simulation {
 	class Simulator
 	{
 	public:
-		explicit Simulator(SimulationConfig config = {}, SimulationData data = {});
+		explicit Simulator(SimulationConfig config = {});
 
 		void advanceFrame();
 
