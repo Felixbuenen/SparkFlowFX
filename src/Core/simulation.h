@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <random>
 #include <vector>
+#include <span>
 
 #include "rand.h"
 #include "glm/vec3.hpp"
@@ -54,6 +55,13 @@ namespace sparkflow::simulation {
 		std::size_t activeEnd{ 0 };
 	};
 
+	// (Temporary) minimal view used by the renderer to render particles.
+	struct ParticleView
+	{
+		std::span<const glm::vec3> positions;
+		std::span<const std::uint8_t> active;
+	};
+
 	class Simulator
 	{
 	public:
@@ -63,6 +71,16 @@ namespace sparkflow::simulation {
 
 		std::size_t frame() const noexcept { return m_frame; }
 		const SimulationConfig& config() const noexcept { return m_config; }
+		
+		// Temporary particle getter, should be refactored.
+		ParticleView particlesView() const noexcept
+		{
+			const std::size_t count = m_simData.activeEnd;
+			return {
+				std::span{ m_simData.positions }.first(count),
+				std::span{ m_simData.active }.first(count)
+			};
+		}
 
 	private:
 		void substep(float dt);

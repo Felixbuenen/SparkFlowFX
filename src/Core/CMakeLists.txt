@@ -14,10 +14,12 @@ set(CORE_SOURCES
     log.cpp
     log.h
     rand.h
-    renderer.cpp
-    renderer.h
     simulation.cpp
     simulation.h
+    rendering/viewportRenderer.cpp
+    rendering/viewportRenderer.h
+    rendering/camera.h
+    rendering/camera.cpp
 )
 
 add_library(Core STATIC ${CORE_SOURCES})

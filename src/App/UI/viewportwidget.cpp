@@ -5,17 +5,24 @@
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
 
-#include "renderer.h"
+// TODO: make a single header directory that contains the API for app
+#include "rendering/viewportRenderer.h"
 #include "simulation.h"
 
 ViewportWidget::ViewportWidget(QWidget* parent, Qt::WindowFlags f)
     : QOpenGLWidget(parent, f)
-    , m_sim{ std::make_unique<sparkflow::simulation::Simulator>()}
+    , m_sim{ std::make_unique<sparkflow::simulation::Simulator>() }
+    , m_vpRenderer{ std::make_unique<sparkflow::render::ViewportRenderer>() }
 {
     connect(this, &QOpenGLWidget::frameSwapped, this, [this] { update(); });
 }
 
-ViewportWidget::~ViewportWidget() = default;
+ViewportWidget::~ViewportWidget()
+{
+    makeCurrent();
+    m_vpRenderer.reset();
+    doneCurrent();
+}
 
 void ViewportWidget::initializeGL()
 {
@@ -30,13 +37,12 @@ void ViewportWidget::initializeGL()
             actual.majorVersion(), actual.minorVersion());
     }
 
-    // Core's GLAD resolves its GL function pointers through Qt's context
-    const bool ok = sparkflow::render::LoadGL([](const char* name) {
+    const bool ok = m_vpRenderer->Initialize([](const char* name) {
         return QOpenGLContext::currentContext()->getProcAddress(name);
         });
 
     if (!ok)
-        qFatal("Failed to load OpenGL functions");
+        qFatal("Failed to initialize the viewport renderer");
 
     m_lastTick = std::chrono::steady_clock::now();
 }
@@ -46,7 +52,7 @@ void ViewportWidget::paintGL()
     advanceSimulation();
 
     // Qt has made the widget's context current and bound its FBO, so Render() draws into the viewport
-    sparkflow::render::Render();
+    m_vpRenderer->Render(m_sim->particlesView());
 }
 
 void ViewportWidget::advanceSimulation()

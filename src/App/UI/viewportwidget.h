@@ -7,6 +7,7 @@
 #include <memory>
 
 namespace sparkflow::simulation { class Simulator; }
+namespace sparkflow::render { class ViewportRenderer; }
 
 class ViewportWidget : public QOpenGLWidget
 {
@@ -23,6 +24,7 @@ private:
     void advanceSimulation();
 
     std::unique_ptr<sparkflow::simulation::Simulator> m_sim;
+    std::unique_ptr<sparkflow::render::ViewportRenderer> m_vpRenderer;
     std::chrono::steady_clock::time_point m_lastTick;
     std::chrono::nanoseconds m_accumulator{};
 };
