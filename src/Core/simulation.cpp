@@ -5,6 +5,7 @@
 #include <numbers>
 
 #include "rand.h"
+#include "log.h"
 
 namespace sparkflow::simulation {
 
@@ -27,9 +28,9 @@ namespace sparkflow::simulation {
 
 
     void Simulator::substep(float dt)
-    {
-        std::cout << "Do step: " << m_frame << "\n";
-        
+    {        
+        SFX_LOG_INFO("Step: {}", m_frame);
+
         solveForces();
         updateVelocities(dt);
         updatePositions(dt);
@@ -55,7 +56,6 @@ namespace sparkflow::simulation {
                 break;
             }
 
-            //std::cout << "emit: look for empty spot " << idx << std::endl;
             // look for empty spot
             if (data.active[idx])
                 continue;
@@ -64,8 +64,6 @@ namespace sparkflow::simulation {
             const float speed = std::lerp(m_config.minSpeed, m_config.maxSpeed, random::uniform01(m_rng));
             const glm::vec3 dir = random::randomUnitVector(m_rng);
             const glm::vec3 initialVel = speed * dir;
-
-            //std::cout << "emit: create new data " << idx << std::endl;
 
             data.active[idx] = true;
             data.positions[idx] = { 0.0f, 0.0f, 0.0f };
@@ -77,7 +75,7 @@ namespace sparkflow::simulation {
             m_emitBudget -= 1.0f;
             data.activeEnd = std::max(data.activeEnd, idx + 1);
 
-            std::cout << "Particle " << idx << " emitted!" << std::endl;
+            SFX_LOG_TRACE("Particle with ID {} created.", idx);
         }
 
         // Pool full.
@@ -134,13 +132,13 @@ namespace sparkflow::simulation {
 
         for (size_t idx = 0; idx < data.activeEnd; ++idx)
         {
-            //std::cout << "updateAges: check active " << idx << std::endl;
             // only active agents
             if (!data.active[idx])
                 continue;
 
-            //std::cout << "updateAges: update age " << idx << std::endl;
             data.ages[idx] += dt;
+
+            SFX_LOG_TRACE("particle {} age={:.3f}", idx, data.ages[idx]);
         }
     }
 
@@ -156,16 +154,16 @@ namespace sparkflow::simulation {
         // update active end
         while (data.activeEnd > 0 && !data.active[data.activeEnd - 1])
             --data.activeEnd;
+
     }
 
     void Simulator::killParticle(size_t idx)
     {
-        //std::cout << "killParticle: trying to kill " << idx << std::endl;
         auto& data = m_simData;
         data.aliveCount--;
         data.active[idx] = false;
 
-        std::cout << "Particle " << idx << " killed!" << std::endl;
+        SFX_LOG_TRACE("Particle with ID {} killed.", idx);
     }
 
 
