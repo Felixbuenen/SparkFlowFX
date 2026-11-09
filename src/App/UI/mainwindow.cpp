@@ -1,15 +1,13 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "mainWindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+#include "ui_mainWindow.h"
+
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , m_ui{ std::make_unique<Ui::MainWindow>() }
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
     showMaximized();
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
+MainWindow::~MainWindow() = default;

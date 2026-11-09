@@ -5,22 +5,22 @@
 #include <type_traits>
 
 #include <glad/gl.h>
-#include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/vec3.hpp>
 
+#include "camera.h"
 #include "log.h"
 #include "simulation.h"
-#include "camera.h"
 
-namespace sparkflow::render {
+namespace sfx::rendering {
 
     namespace {
 
         static_assert(std::is_same_v<GLuint, unsigned int>);
 
-        constexpr GLint kViewProjLocation = 0;
+        constexpr GLint viewProjLocation = 0;
 
-        constexpr const char* kVertexSource = R"(#version 460 core
+        constexpr const char* vertexSource = R"(#version 460 core
 layout(location = 0) in vec3 aPosition;
 layout(location = 0) uniform mat4 uViewProj;
 
@@ -31,7 +31,7 @@ void main()
 }
 )";
 
-        constexpr const char* kFragmentSource = R"(#version 460 core
+        constexpr const char* fragmentSource = R"(#version 460 core
 out vec4 fragColor;
 
 void main()
@@ -91,9 +91,11 @@ void main()
 
     ViewportRenderer::~ViewportRenderer()
     {
-        // GL functions are only loaded once Initialize succeeded
+        // GL functions are only loaded once initialize() succeeded
         if (m_program == 0)
+        {
             return;
+        }
 
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
@@ -108,16 +110,20 @@ void main()
             return false;
         }
 
-        const GLuint vertexShader = compileShader(GL_VERTEX_SHADER, kVertexSource);
-        const GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, kFragmentSource);
+        const GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexSource);
+        const GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentSource);
         if (vertexShader != 0 && fragmentShader != 0)
+        {
             m_program = linkProgram(vertexShader, fragmentShader);
+        }
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
         if (m_program == 0)
+        {
             return false;
+        }
 
         const std::array<glm::vec3, 4> testPoints{ {
             { 0.0f, 0.0f,  0.0f },
@@ -144,11 +150,11 @@ void main()
 
     void ViewportRenderer::render([[maybe_unused]] const simulation::ParticleView& particles, const Camera& camera)
     {
-        glClearColor(0.f, 0.f, 0.f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         const glm::mat4 viewProj = camera.viewProjection();
-        glProgramUniformMatrix4fv(m_program, kViewProjLocation, 1, GL_FALSE, glm::value_ptr(viewProj));
+        glProgramUniformMatrix4fv(m_program, viewProjLocation, 1, GL_FALSE, glm::value_ptr(viewProj));
 
         glEnable(GL_PROGRAM_POINT_SIZE);
         glUseProgram(m_program);
@@ -156,4 +162,4 @@ void main()
         glDrawArrays(GL_POINTS, 0, m_pointCount);
     }
 
-}
+} // namespace sfx::rendering

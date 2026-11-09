@@ -1,109 +1,114 @@
 #pragma once
 
-#include <chrono>
 #include <cstdint>
-#include <random>
-#include <vector>
 #include <span>
+#include <vector>
 
-#include "rand.h"
-#include "glm/vec3.hpp"
+#include <glm/vec3.hpp>
 
-namespace sparkflow::simulation {
+#include "random.h"
 
-	struct SimulationConfig
-	{
-		// FPS is the real-time playback, substeps are how many simulation steps are taken per frame.
-		std::uint32_t framesPerSecond{ 24 };
-		std::uint32_t substeps{ 1 };
+namespace sfx::simulation {
 
-		std::size_t capacity{ 2'000 };
+    struct SimulationConfig
+    {
+        // FPS is the real-time playback rate, substeps the number of simulation steps per frame.
+        std::uint32_t framesPerSecond{ 24 };
+        std::uint32_t substeps{ 1 };
 
-		// TEMP particle simulation config
-		float emitRateSec{ 10.0f };
-		float minSpeed{ 1.0f };
-		float maxSpeed{ 5.0f };
-		float lifespanSec{ 4.0f };
-		std::uint32_t seed{ 1 };
+        std::size_t capacity{ 2'000 };
 
-		// TEMP forces
-		glm::vec3 gravity{ 0.0f, -9.81f, 0.0f };
-		float drag{ 0.5f };
-	};
+        // temporary emitter settings
+        float emitRateSec{ 10.0f };
+        float minSpeed{ 1.0f };
+        float maxSpeed{ 5.0f };
+        float lifespanSec{ 4.0f };
+        std::uint32_t seed{ 1 };
 
-	struct SimulationData
-	{
-		explicit SimulationData(std::size_t capacity)
-			: active(capacity, false)
-			, positions(capacity)
-			, velocities(capacity)
-			, forces(capacity)
-			, ages(capacity)
-			, lifespans(capacity)
-		{
-		}
+        // temporary forces
+        glm::vec3 gravity{ 0.0f, -9.81f, 0.0f };
+        float drag{ 0.5f };
+    };
 
-		// TODO: should probably become array?
-		std::vector<std::uint8_t> active;
-		std::vector<glm::vec3> positions;
-		std::vector<glm::vec3> velocities;
-		std::vector<glm::vec3> forces;
-		std::vector<float> ages;
-		std::vector<float> lifespans;
+    struct SimulationData
+    {
+        explicit SimulationData(std::size_t capacity)
+            : active(capacity, false)
+            , positions(capacity)
+            , velocities(capacity)
+            , forces(capacity)
+            , ages(capacity)
+            , lifespans(capacity)
+        {
+        }
 
-		std::size_t aliveCount{ 0 };
-		std::size_t activeEnd{ 0 };
-	};
+        // TODO: should probably become array?
+        std::vector<std::uint8_t> active;
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec3> velocities;
+        std::vector<glm::vec3> forces;
+        std::vector<float> ages;
+        std::vector<float> lifespans;
 
-	// (Temporary) minimal view used by the renderer to render particles.
-	struct ParticleView
-	{
-		std::span<const glm::vec3> positions;
-		std::span<const std::uint8_t> active;
-	};
+        std::size_t aliveCount{ 0 };
+        std::size_t activeEnd{ 0 };
+    };
 
-	class Simulator
-	{
-	public:
-		explicit Simulator(SimulationConfig config = {});
+    // Temporary minimal view used by the renderer.
+    struct ParticleView
+    {
+        std::span<const glm::vec3> positions;
+        std::span<const std::uint8_t> active;
+    };
 
-		void advanceFrame();
+    class Simulator
+    {
+    public:
+        explicit Simulator(SimulationConfig config = {});
 
-		std::size_t frame() const noexcept { return m_frame; }
-		const SimulationConfig& config() const noexcept { return m_config; }
-		
-		// Temporary particle getter, should be refactored.
-		ParticleView particlesView() const noexcept
-		{
-			const std::size_t count = m_simData.activeEnd;
-			return {
-				std::span{ m_simData.positions }.first(count),
-				std::span{ m_simData.active }.first(count)
-			};
-		}
+        void advanceFrame();
 
-	private:
-		void substep(float dt);
+        std::size_t frame() const noexcept
+        {
+            return m_frame;
+        }
 
-		// operators
-		void emitNew(float dt);
-		void solveForces();
-		void updateVelocities(float dt);
-		void updatePositions(float dt);
-		void updateAges(float dt);
-		void kill();
+        const SimulationConfig& config() const noexcept
+        {
+            return m_config;
+        }
 
-		// utility
-		void killParticle(size_t idx);
+        // TODO: temporary particle getter, to be refactored.
+        ParticleView particlesView() const noexcept
+        {
+            const std::size_t count = m_simData.activeEnd;
+            return {
+                std::span{ m_simData.positions }.first(count),
+                std::span{ m_simData.active }.first(count)
+            };
+        }
 
-	private:
-		SimulationConfig m_config;
-		random::Engine m_rng; // random 32-bit integers
-		std::size_t m_frame{ 0 };
-		float m_emitBudget{ 0.0f };
+    private:
+        void substep(float dt);
 
-		// PARTICLE DATA
-		SimulationData m_simData;
-	};
+        // operators
+        void emitNew(float dt);
+        void solveForces() noexcept;
+        void updateVelocities(float dt) noexcept;
+        void updatePositions(float dt) noexcept;
+        void updateAges(float dt);
+        void kill();
 
-}
+        // utility
+        void killParticle(std::size_t idx);
+
+    private:
+        SimulationConfig m_config;
+        random::Engine m_rng;
+        std::size_t m_frame{ 0 };
+        float m_emitBudget{ 0.0f };
+
+        SimulationData m_simData;
+    };
+
+} // namespace sfx::simulation

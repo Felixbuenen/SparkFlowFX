@@ -1,10 +1,10 @@
 #pragma once
 
-namespace sparkflow::simulation {
+namespace sfx::simulation {
     struct ParticleView;
-}
+} // namespace sfx::simulation
 
-namespace sparkflow::render {
+namespace sfx::rendering {
 
     class Camera;
 
@@ -12,7 +12,7 @@ namespace sparkflow::render {
     {
     public:
         using GLProc = void (*)();
-        using GLProcLoader = GLProc(*)(const char*);
+        using GLProcLoader = GLProc (*)(const char*);
 
         ViewportRenderer() = default;
         ~ViewportRenderer();
@@ -24,10 +24,11 @@ namespace sparkflow::render {
         void render(const simulation::ParticleView& particles, const Camera& camera);
 
     private:
-        // TEMP OpenGL buffers for minimal renderer
+        // temporary GL objects for the minimal renderer
         unsigned int m_program{ 0 };
         unsigned int m_vao{ 0 };
         unsigned int m_vbo{ 0 };
         int m_pointCount{ 0 };
     };
-}
+
+} // namespace sfx::rendering

@@ -1,22 +1,27 @@
 #pragma once
 
-#include <QOpenGLWidget>
-
-#include "simulation.h"
-#include "rendering/camera.h"
-
 #include <chrono>
 #include <memory>
 
-namespace sparkflow::simulation { class Simulator; }
-namespace sparkflow::render { class ViewportRenderer; }
+#include <QOpenGLWidget>
+
+#include "rendering/camera.h"
+
+namespace sfx::simulation {
+    class Simulator;
+} // namespace sfx::simulation
+
+namespace sfx::rendering {
+    class ViewportRenderer;
+} // namespace sfx::rendering
 
 class ViewportWidget : public QOpenGLWidget
 {
     Q_OBJECT
+
 public:
-    ViewportWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-    ~ViewportWidget();
+    explicit ViewportWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    ~ViewportWidget() override;
 
 protected:
     void initializeGL() override;
@@ -26,10 +31,10 @@ protected:
 private:
     void advanceSimulation();
 
-    std::unique_ptr<sparkflow::simulation::Simulator> m_sim;
-    std::unique_ptr<sparkflow::render::ViewportRenderer> m_vpRenderer;
+    std::unique_ptr<sfx::simulation::Simulator> m_sim;
+    std::unique_ptr<sfx::rendering::ViewportRenderer> m_vpRenderer;
     std::chrono::steady_clock::time_point m_lastTick;
     std::chrono::nanoseconds m_accumulator{};
 
-    sparkflow::render::Camera m_camera;
+    sfx::rendering::Camera m_camera;
 };

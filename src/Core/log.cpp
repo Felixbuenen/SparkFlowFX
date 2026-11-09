@@ -5,6 +5,7 @@
 #include <string>
 
 namespace sfx::log {
+
     namespace {
 
         std::string_view fileName(std::string_view path)
@@ -15,11 +16,13 @@ namespace sfx::log {
 
     } // namespace
 
-    std::optional<Level> parseLevel(std::string_view name)
+    std::optional<Level> parseLevel(std::string_view name) noexcept
     {
         constexpr std::array levels{ Level::Off, Level::Error, Level::Warning, Level::Info, Level::Debug, Level::Trace };
-        for (const Level level : levels) {
-            if (toString(level) == name) {
+        for (const Level level : levels)
+        {
+            if (toString(level) == name)
+            {
                 return level;
             }
         }

@@ -1,9 +1,9 @@
-set(SPARKFLOW_LOG_LEVELS Off Error Warning Info Debug Trace)
-set(SPARKFLOW_LOG_LEVEL "Trace" CACHE STRING "Compile-time log ceiling")
-set_property(CACHE SPARKFLOW_LOG_LEVEL PROPERTY STRINGS ${SPARKFLOW_LOG_LEVELS})
+set(SFX_LOG_LEVELS Off Error Warning Info Debug Trace)
+set(SFX_LOG_LEVEL "Trace" CACHE STRING "Compile-time log ceiling")
+set_property(CACHE SFX_LOG_LEVEL PROPERTY STRINGS ${SFX_LOG_LEVELS})
 
-if(NOT SPARKFLOW_LOG_LEVEL IN_LIST SPARKFLOW_LOG_LEVELS)
-    message(FATAL_ERROR "SPARKFLOW_LOG_LEVEL must be one of: ${SPARKFLOW_LOG_LEVELS}")
+if(NOT SFX_LOG_LEVEL IN_LIST SFX_LOG_LEVELS)
+    message(FATAL_ERROR "SFX_LOG_LEVEL must be one of: ${SFX_LOG_LEVELS}")
 endif()
 
 add_subdirectory(vendor/glad)
@@ -13,7 +13,7 @@ set(CORE_SOURCES
     core.cpp
     log.cpp
     log.h
-    rand.h
+    random.h
     simulation.cpp
     simulation.h
     rendering/viewportRenderer.cpp
@@ -33,7 +33,7 @@ target_include_directories(Core
 
 target_compile_definitions(Core
     PUBLIC
-        SPARKFLOW_LOG_LEVEL=${SPARKFLOW_LOG_LEVEL}
+        SFX_LOG_LEVEL=${SFX_LOG_LEVEL}
 )
 
 target_link_libraries(Core

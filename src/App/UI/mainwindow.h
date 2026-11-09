@@ -1,12 +1,13 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
+
+#include <memory>
 
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
-class MainWindow;
-}
+    class MainWindow;
+} // namespace Ui
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -14,10 +15,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
 private:
-    Ui::MainWindow *ui;
+    std::unique_ptr<Ui::MainWindow> m_ui;
 };
-#endif // MAINWINDOW_H

@@ -1,13 +1,12 @@
 #include "simulation.h"
 
-#include <iostream>
+#include <algorithm>
 #include <cmath>
-#include <numbers>
 
-#include "rand.h"
 #include "log.h"
+#include "random.h"
 
-namespace sparkflow::simulation {
+namespace sfx::simulation {
 
     Simulator::Simulator(SimulationConfig config)
         : m_config{ config }
@@ -21,14 +20,15 @@ namespace sparkflow::simulation {
         const float dt = 1.0f / static_cast<float>(m_config.framesPerSecond * m_config.substeps);
 
         for (std::uint32_t i = 0; i < m_config.substeps; ++i)
+        {
             substep(dt);
+        }
 
         ++m_frame;
     }
 
-
     void Simulator::substep(float dt)
-    {        
+    {
         SFX_LOG_INFO("Step: {}", m_frame);
 
         solveForces();
@@ -39,7 +39,7 @@ namespace sparkflow::simulation {
         emitNew(dt);
     }
 
-    // OPERATORS
+    // operators
 
     void Simulator::emitNew(float dt)
     {
@@ -58,7 +58,9 @@ namespace sparkflow::simulation {
 
             // look for empty spot
             if (data.active[idx])
+            {
                 continue;
+            }
 
             // random speed and initial direction
             const float speed = std::lerp(m_config.minSpeed, m_config.maxSpeed, random::uniform01(m_rng));
@@ -84,14 +86,16 @@ namespace sparkflow::simulation {
         m_emitBudget -= std::floor(m_emitBudget);
     }
 
-    void Simulator::solveForces()
+    void Simulator::solveForces() noexcept
     {
         auto& data = m_simData;
 
         for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
         {
             if (!data.active[idx])
+            {
                 continue;
+            }
 
             // TODO: currently hard-coded forces - gravity and drag. Should depend on user-defined force-network.
             // Drag is currently calculated simply as F_drag = -k * V.
@@ -99,28 +103,32 @@ namespace sparkflow::simulation {
         }
     }
 
-    void Simulator::updateVelocities(float dt)
+    void Simulator::updateVelocities(float dt) noexcept
     {
         auto& data = m_simData;
 
         for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
         {
             if (!data.active[idx])
+            {
                 continue;
+            }
 
-            // solving F=ma (assuming a = 1), where a = (V-V0)/t
+            // F = ma with m = 1, so a = F.
             data.velocities[idx] += data.forces[idx] * dt;
         }
     }
 
-    void Simulator::updatePositions(float dt)
+    void Simulator::updatePositions(float dt) noexcept
     {
         auto& data = m_simData;
 
         for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
         {
             if (!data.active[idx])
+            {
                 continue;
+            }
 
             data.positions[idx] += data.velocities[idx] * dt;
         }
@@ -130,11 +138,12 @@ namespace sparkflow::simulation {
     {
         auto& data = m_simData;
 
-        for (size_t idx = 0; idx < data.activeEnd; ++idx)
+        for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
         {
-            // only active agents
             if (!data.active[idx])
+            {
                 continue;
+            }
 
             data.ages[idx] += dt;
 
@@ -148,16 +157,19 @@ namespace sparkflow::simulation {
         for (std::size_t idx = 0; idx < data.activeEnd; ++idx)
         {
             if (data.active[idx] && data.ages[idx] >= data.lifespans[idx])
+            {
                 killParticle(idx);
+            }
         }
 
         // update active end
         while (data.activeEnd > 0 && !data.active[data.activeEnd - 1])
+        {
             --data.activeEnd;
-
+        }
     }
 
-    void Simulator::killParticle(size_t idx)
+    void Simulator::killParticle(std::size_t idx)
     {
         auto& data = m_simData;
         data.aliveCount--;
@@ -166,5 +178,4 @@ namespace sparkflow::simulation {
         SFX_LOG_TRACE("Particle with ID {} killed.", idx);
     }
 
-
-}
+} // namespace sfx::simulation

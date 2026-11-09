@@ -1,9 +1,10 @@
-#include "viewportwidget.h"
+#include "viewportWidget.h"
 
 #include <algorithm>
-#include <QtLogging>
+
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
+#include <QtLogging>
 
 // TODO: make a single header directory that contains the API for app
 #include "rendering/viewportRenderer.h"
@@ -11,8 +12,8 @@
 
 ViewportWidget::ViewportWidget(QWidget* parent, Qt::WindowFlags f)
     : QOpenGLWidget(parent, f)
-    , m_sim{ std::make_unique<sparkflow::simulation::Simulator>() }
-    , m_vpRenderer{ std::make_unique<sparkflow::render::ViewportRenderer>() }
+    , m_sim{ std::make_unique<sfx::simulation::Simulator>() }
+    , m_vpRenderer{ std::make_unique<sfx::rendering::ViewportRenderer>() }
 {
     connect(this, &QOpenGLWidget::frameSwapped, this, [this] { update(); });
 }
@@ -39,27 +40,29 @@ void ViewportWidget::initializeGL()
 
     const bool ok = m_vpRenderer->initialize([](const char* name) {
         return QOpenGLContext::currentContext()->getProcAddress(name);
-        });
+    });
 
     if (!ok)
+    {
         qFatal("Failed to initialize the viewport renderer");
+    }
 
     m_lastTick = std::chrono::steady_clock::now();
 }
 
-// called when viewport is resized, requires recalculation of aspect ratio
 void ViewportWidget::resizeGL(int width, int height)
 {
     if (height > 0)
+    {
         m_camera.setAspectRatio(static_cast<float>(width) / static_cast<float>(height));
-
+    }
 }
 
 void ViewportWidget::paintGL()
 {
     advanceSimulation();
 
-    // Qt has made the widget's context current and bound its FBO, so Render() draws into the viewport
+    // Qt has made the widget's context current and bound its FBO, so render() draws into the viewport
     m_vpRenderer->render(m_sim->particlesView(), m_camera);
 }
 

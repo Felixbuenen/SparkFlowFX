@@ -16,11 +16,11 @@ qt_standard_project_setup()
 
 set(APP_SOURCES
     main.cpp
-    UI/mainwindow.cpp
-    UI/mainwindow.h
-    UI/mainwindow.ui
-    UI/viewportwidget.cpp
-    UI/viewportwidget.h
+    ui/mainWindow.cpp
+    ui/mainWindow.h
+    ui/mainWindow.ui
+    ui/viewportWidget.cpp
+    ui/viewportWidget.h
 )
 
 add_executable(App ${APP_SOURCES})
@@ -29,7 +29,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${APP_SOURCES})
 
 target_include_directories(App
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/UI
+        ${CMAKE_CURRENT_SOURCE_DIR}/ui
 )
 
 target_link_libraries(App
