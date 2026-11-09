@@ -37,7 +37,7 @@ void ViewportWidget::initializeGL()
             actual.majorVersion(), actual.minorVersion());
     }
 
-    const bool ok = m_vpRenderer->Initialize([](const char* name) {
+    const bool ok = m_vpRenderer->initialize([](const char* name) {
         return QOpenGLContext::currentContext()->getProcAddress(name);
         });
 
@@ -47,12 +47,20 @@ void ViewportWidget::initializeGL()
     m_lastTick = std::chrono::steady_clock::now();
 }
 
+// called when viewport is resized, requires recalculation of aspect ratio
+void ViewportWidget::resizeGL(int width, int height)
+{
+    if (height > 0)
+        m_camera.setAspectRatio(static_cast<float>(width) / static_cast<float>(height));
+
+}
+
 void ViewportWidget::paintGL()
 {
     advanceSimulation();
 
     // Qt has made the widget's context current and bound its FBO, so Render() draws into the viewport
-    m_vpRenderer->Render(m_sim->particlesView());
+    m_vpRenderer->render(m_sim->particlesView(), m_camera);
 }
 
 void ViewportWidget::advanceSimulation()

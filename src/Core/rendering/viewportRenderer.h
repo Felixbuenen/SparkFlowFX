@@ -6,6 +6,8 @@ namespace sparkflow::simulation {
 
 namespace sparkflow::render {
 
+    class Camera;
+
     class ViewportRenderer
     {
     public:
@@ -18,8 +20,8 @@ namespace sparkflow::render {
         ViewportRenderer(const ViewportRenderer&) = delete;
         ViewportRenderer& operator=(const ViewportRenderer&) = delete;
 
-        bool Initialize(GLProcLoader loader);
-        void Render(const simulation::ParticleView& particles);
+        bool initialize(GLProcLoader loader);
+        void render(const simulation::ParticleView& particles, const Camera& camera);
 
     private:
         // TEMP OpenGL buffers for minimal renderer

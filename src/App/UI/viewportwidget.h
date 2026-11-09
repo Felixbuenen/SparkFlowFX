@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QOpenGLWidget>
+
 #include "simulation.h"
+#include "rendering/camera.h"
 
 #include <chrono>
 #include <memory>
@@ -18,6 +20,7 @@ public:
 
 protected:
     void initializeGL() override;
+    void resizeGL(int width, int height) override;
     void paintGL() override;
 
 private:
@@ -27,4 +30,6 @@ private:
     std::unique_ptr<sparkflow::render::ViewportRenderer> m_vpRenderer;
     std::chrono::steady_clock::time_point m_lastTick;
     std::chrono::nanoseconds m_accumulator{};
+
+    sparkflow::render::Camera m_camera;
 };

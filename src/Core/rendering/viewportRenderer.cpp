@@ -6,9 +6,11 @@
 
 #include <glad/gl.h>
 #include <glm/vec3.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "log.h"
 #include "simulation.h"
+#include "camera.h"
 
 namespace sparkflow::render {
 
@@ -16,12 +18,15 @@ namespace sparkflow::render {
 
         static_assert(std::is_same_v<GLuint, unsigned int>);
 
+        constexpr GLint kViewProjLocation = 0;
+
         constexpr const char* kVertexSource = R"(#version 460 core
 layout(location = 0) in vec3 aPosition;
+layout(location = 0) uniform mat4 uViewProj;
 
 void main()
 {
-    gl_Position = vec4(aPosition, 1.0);
+    gl_Position = uViewProj * vec4(aPosition, 1.0);
     gl_PointSize = 8.0;
 }
 )";
@@ -31,7 +36,7 @@ out vec4 fragColor;
 
 void main()
 {
-    fragColor = vec4(0.1, 0.1, 0.1, 1.0);
+    fragColor = vec4(0.8, 0.8, 0.8, 1.0);
 }
 )";
 
@@ -95,7 +100,7 @@ void main()
         glDeleteProgram(m_program);
     }
 
-    bool ViewportRenderer::Initialize(GLProcLoader loader)
+    bool ViewportRenderer::initialize(GLProcLoader loader)
     {
         if (gladLoadGL(loader) == 0)
         {
@@ -114,10 +119,11 @@ void main()
         if (m_program == 0)
             return false;
 
-        const std::array<glm::vec3, 3> testPoints{ {
-            { -0.5f, -0.5f, 0.0f },
-            {  0.5f, -0.5f, 0.0f },
-            {  0.0f,  0.5f, 0.0f },
+        const std::array<glm::vec3, 4> testPoints{ {
+            { 0.0f, 0.0f,  0.0f },
+            { 1.0f, 0.0f,  0.0f },
+            { 0.0f, 1.0f,  0.0f },
+            { 0.0f, 0.0f, -3.0f },
         } };
         m_pointCount = static_cast<int>(testPoints.size());
 
@@ -136,10 +142,13 @@ void main()
         return true;
     }
 
-    void ViewportRenderer::Render([[maybe_unused]] const simulation::ParticleView& particles)
+    void ViewportRenderer::render([[maybe_unused]] const simulation::ParticleView& particles, const Camera& camera)
     {
-        glClearColor(242.f / 255.f, 239.f / 255.f, 58.f / 255.f, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        const glm::mat4 viewProj = camera.viewProjection();
+        glProgramUniformMatrix4fv(m_program, kViewProjLocation, 1, GL_FALSE, glm::value_ptr(viewProj));
 
         glEnable(GL_PROGRAM_POINT_SIZE);
         glUseProgram(m_program);
